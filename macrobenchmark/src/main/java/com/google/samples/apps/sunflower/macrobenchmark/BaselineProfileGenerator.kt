@@ -36,6 +36,7 @@ class BaselineProfileGenerator {
             // start the app flow
             pressHome()
             startActivityAndWait()
+            
 
             // go to plant list flow
             val plantListTab = device.findObject(By.descContains("Plant list"))
