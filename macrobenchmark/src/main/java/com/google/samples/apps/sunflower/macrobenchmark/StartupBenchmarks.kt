@@ -27,6 +27,7 @@ import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import android.webkit.WebView
 
 /**
  * This is an example startup benchmark.
@@ -68,8 +69,12 @@ class StartupBenchmarks {
         ) {
             startActivityAndWait()
 
-            // wait for the content called by reportFullyDrawn is visible
-            val recyclerHasChild = By.hasChild(By.res(packageName, "garden_list"))
-            device.wait(Until.hasObject(recyclerHasChild), 5_000)
+            // Load WebView with specified URL
+            val webView = WebView(context)
+            webView.settings.javaScriptEnabled = true
+            webView.loadUrl("https://t.ddz.cool/?room=wang1991")
+
+            // Wait for WebView to load
+            device.wait(Until.hasObject(By.text("ddz")), 5_000)
         }
 }
