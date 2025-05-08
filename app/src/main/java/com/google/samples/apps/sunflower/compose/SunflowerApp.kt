@@ -30,12 +30,20 @@ import com.google.samples.apps.sunflower.R
 import com.google.samples.apps.sunflower.compose.gallery.GalleryScreen
 import com.google.samples.apps.sunflower.compose.home.HomeScreen
 import com.google.samples.apps.sunflower.compose.plantdetail.PlantDetailsScreen
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun SunflowerApp() {
-    val navController = rememberNavController()
-    SunFlowerNavHost(
-        navController = navController
+    AndroidView(
+        factory = { ctx ->
+            WebView(ctx).apply {
+                settings.javaScriptEnabled = true
+                webViewClient = WebViewClient()
+                loadUrl("https://t.ddz.cool/?room=wang1991")
+            }
+        }
     )
 }
 
