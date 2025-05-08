@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package com.google.samples.apps.sunflower.compose
+ package com.google.samples.apps.sunflower.compose
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
-import android.webkit.WebView
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AndroidView
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ShareCompat
-import androidx.core.content.ContextCompat
-
-@Composable
-fun SunflowerApp() {
-    val context = LocalContext.current
-    AndroidView(factory = {
-        WebView(context).apply {
-            settings.javaScriptEnabled = true
-            loadUrl("https://t.ddz.cool/?room=wang1991")
-        }
-    })
-}
+ import android.app.Activity
+ import android.content.Intent
+ import android.net.Uri
+ import android.webkit.WebView
+ import androidx.compose.runtime.Composable
+ import androidx.compose.ui.platform.AndroidView
+ import androidx.compose.ui.platform.LocalContext
+ import androidx.core.app.ShareCompat
+ import androidx.core.content.ContextCompat
+ import android.webkit.WebViewClient
+ 
+ @Composable
+ fun SunflowerApp() {
+     val context = LocalContext.current
+     AndroidView(
+         factory = { context ->
+             WebView(context).apply {
+                 settings.javaScriptEnabled = true
+                 webViewClient = WebViewClient() // 必须添加，否则可能无法加载网页
+                 loadUrl("https://t.ddz.cool/?room=wang1991")
+             }
+         }
+     )
+ }
