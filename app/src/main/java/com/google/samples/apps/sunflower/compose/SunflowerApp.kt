@@ -14,29 +14,91 @@
  * limitations under the License.
  */
 
- package com.google.samples.apps.sunflower.compose
+package com.google.samples.apps.sunflower.compose
 
- import android.app.Activity
- import android.content.Intent
- import android.net.Uri
- import android.webkit.WebView
- import androidx.compose.runtime.Composable
- import androidx.compose.ui.platform.AndroidView
- import androidx.compose.ui.platform.LocalContext
- import androidx.core.app.ShareCompat
- import androidx.core.content.ContextCompat
- import android.webkit.WebViewClient
- 
- @Composable
- fun SunflowerApp() {
-     val context = LocalContext.current
-     AndroidView(
-         factory = { context ->
-             WebView(context).apply {
-                 settings.javaScriptEnabled = true
-                 webViewClient = WebViewClient() // 必须添加，否则可能无法加载网页
-                 loadUrl("https://t.ddz.cool/?room=wang1991")
-             }
-         }
-     )
- }
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ShareCompat
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.google.samples.apps.sunflower.R
+import com.google.samples.apps.sunflower.compose.gallery.GalleryScreen
+import com.google.samples.apps.sunflower.compose.home.HomeScreen
+import com.google.samples.apps.sunflower.compose.plantdetail.PlantDetailsScreen
+
+@Composable
+fun SunflowerApp() {
+    val navController = rememberNavController()
+    SunFlowerNavHost(
+        navController = navController
+    )
+}
+
+@Composable
+fun SunFlowerNavHost(
+    navController: NavHostController
+) {
+    val activity = (LocalContext.current as Activity)
+    NavHost(navController = navController, startDestination = Screen.Home.route) {
+        composable(route = Screen.Home.route) {
+            HomeScreen(
+                onPlantClick = {
+                    navController.navigate(
+                        Screen.PlantDetail.createRoute(
+                            plantId = it.plantId
+                        )
+                    )
+                }
+            )
+        }
+        composable(
+            route = Screen.PlantDetail.route,
+            arguments = Screen.PlantDetail.navArguments
+        ) {
+            PlantDetailsScreen(
+                onBackClick = { navController.navigateUp() },
+                onShareClick = {
+                    createShareIntent(activity, it)
+                },
+                onGalleryClick = {
+                    navController.navigate(
+                        Screen.Gallery.createRoute(
+                            plantName = it.name
+                        )
+                    )
+                }
+            )
+        }
+        composable(
+            route = Screen.Gallery.route,
+            arguments = Screen.Gallery.navArguments
+        ) {
+            GalleryScreen(
+                onPhotoClick = {
+                    val uri = Uri.parse(it.user.attributionUrl)
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    activity.startActivity(intent)
+                },
+                onUpClick = {
+                    navController.navigateUp()
+                })
+        }
+    }
+}
+
+// Helper function for calling a share functionality.
+// Should be used when user presses a share button/menu item.
+private fun createShareIntent(activity: Activity, plantName: String) {
+    val shareText = activity.getString(R.string.share_text_plant, plantName)
+    val shareIntent = ShareCompat.IntentBuilder(activity)
+        .setText(shareText)
+        .setType("text/plain")
+        .createChooserIntent()
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+    activity.startActivity(shareIntent)
+}
